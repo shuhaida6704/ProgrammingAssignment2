@@ -1,15 +1,57 @@
-## Put comments here that give an overall description of what your
-## functions do
-
-## Write a short comment describing this function
 
 makeCacheMatrix <- function(x = matrix()) {
+  ##makeCacheMatrix: This function creates a special "matrix" object that can cache its inverse.
 
+  m <- NULL
+  set <- function(y) {
+    x <<- y
+    m <<- NULL
+  }
+  get <- function() x
+  setmean <- function(mean) m <<- mean
+  getmean <- function() m
+  list(set = set, get = get,
+       setmean = setmean,
+       getmean = getmean)
 }
 
-
-## Write a short comment describing this function
 
 cacheSolve <- function(x, ...) {
-        ## Return a matrix that is the inverse of 'x'
+  ##cacheSolve: This function computes the inverse of the special "matrix" returned by makeCacheMatrix above. If the inverse has already been calculated (and the matrix has not changed), then the cachesolve should retrieve the inverse from the cache.
+  ## Return a matrix that is the inverse of 'x' 
+  
+  m <- x$getmean()
+  if(!is.null(m)) {
+    message("getting cached data")
+    return(m)
+  }
+  data <- x$get()
+  m <- solve(data, ...)
+  x$setmean(m)
+  m
 }
+
+##--SAMPLE OUTPUT--
+##try1<-makeCacheMatrix(x = matrix(1:4, 2))
+##> try1$get()
+##[,1] [,2]
+##[1,]    1    3
+##[2,]    2    4
+##> try1$set(matrix(1:4, 2))
+##> try1$get()
+##[,1] [,2]
+##[1,]    1    3
+##[2,]    2    4
+##> cacheSolve(try1)
+##[,1] [,2]
+##[1,]   -2  1.5
+##[2,]    1 -0.5
+##> try1$getmean()
+##[,1] [,2]
+##[1,]   -2  1.5
+##[2,]    1 -0.5
+##> b<-try1$getmean()
+##> try1$get() %*%b
+##[,1] [,2]
+##[1,]    1    0
+##[2,]    0    1
